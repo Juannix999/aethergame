@@ -15,6 +15,7 @@ interface GameOverModalProps {
   onHome: () => void;
   onOpenHangar: () => void;
   onOpenAchievements: () => void;
+  onOpenApkModal?: () => void;
 }
 
 export const GameOverModal: React.FC<GameOverModalProps> = ({
@@ -23,6 +24,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   onHome,
   onOpenHangar,
   onOpenAchievements,
+  onOpenApkModal,
 }) => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -125,6 +127,20 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               <span>Logros</span>
             </button>
           </div>
+
+          {onOpenApkModal && (
+            <button
+              type="button"
+              onClick={() => {
+                sound.click();
+                onOpenApkModal();
+              }}
+              className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold tracking-wide transition-all"
+            >
+              <span>📲</span>
+              <span>Descargar APK Android / Compartir en GitHub</span>
+            </button>
+          )}
 
           <button
             type="button"

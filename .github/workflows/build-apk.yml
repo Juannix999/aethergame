@@ -1,0 +1,92 @@
+name: Build Android APK (Aether Strike)
+
+on:
+  push:
+    branches: [main, master]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build & Package Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Node dependencies
+        run: npm install
+
+      - name: ☕ Setup Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: 📱 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: ⚡ Build Web Assets (Vite)
+        run: npm run build
+
+      - name: 🔄 Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: 🔑 Grant execute permission for gradlew
+        run: chmod +x ./android/gradlew
+
+      - name: 🚀 Compile Android Debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: 📋 Organize APK artifact
+        run: |
+          mkdir -p dist-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist-apk/AetherStrike-HyperSurvivor-v1.0.apk
+          ls -la dist-apk/
+
+      - name: 📤 Upload APK Artifact to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: AetherStrike-HyperSurvivor-v1.0-APK
+          path: dist-apk/AetherStrike-HyperSurvivor-v1.0.apk
+          retention-days: 30
+
+      - name: 🏷️ Publish APK to GitHub Release (on tag or release)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-apk/AetherStrike-HyperSurvivor-v1.0.apk
+          name: Aether Strike Release ${{ github.ref_name }}
+          body: |
+            ## 🚀 Aether Strike: Hyper Survivor - APK Android
+            
+            ¡El paquete APK nativo de **Aether Strike** para dispositivos Android está listo!
+            
+            ### 📥 Descarga directa:
+            - **Archivo:** `AetherStrike-HyperSurvivor-v1.0.apk`
+            - **Arquitecturas:** Universal (ARM64, ARMv7, x86_64)
+            - **Android Mínimo:** Android 7.0 (API 24)+
+            
+            ### 📲 Instrucciones de instalación:
+            1. Descarga el archivo `.apk` adjunto en tu teléfono Android.
+            2. Abre el archivo descargado.
+            3. Si tu dispositivo lo solicita, pulsa "Permitir instalar aplicaciones de fuentes desconocidas".
+            4. ¡Abre el juego y despega a combatir a 60 FPS con controles táctiles nativos!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

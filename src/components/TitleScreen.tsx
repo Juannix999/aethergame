@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Shield, Wrench, Trophy, Volume2, VolumeX, Smartphone, Monitor } from 'lucide-react';
+import { Play, Shield, Wrench, Trophy, Volume2, VolumeX, Smartphone, Monitor, Download } from 'lucide-react';
 import { ShipConfig, ShipId, HighScoreRecord } from '../game/types';
 import { SHIPS } from '../game/upgrades';
 import { sound } from '../game/audio';
@@ -11,6 +11,7 @@ interface TitleScreenProps {
   onStartGame: () => void;
   onOpenHangar: () => void;
   onOpenAchievements: () => void;
+  onOpenApkModal: () => void;
   coins: number;
   unlockedShips: ShipId[];
   isMuted: boolean;
@@ -26,6 +27,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   onStartGame,
   onOpenHangar,
   onOpenAchievements,
+  onOpenApkModal,
   coins,
   unlockedShips,
   isMuted,
@@ -53,6 +55,19 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
 
         {/* Action icons cluster */}
         <div className="flex items-center gap-2">
+          {/* APK / GitHub Download Button */}
+          <button
+            type="button"
+            onClick={() => {
+              sound.click();
+              onOpenApkModal();
+            }}
+            className="px-2.5 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 transition-colors text-xs flex items-center gap-1.5 shadow-sm"
+            title="Descargar APK para Android / GitHub"
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-mono text-[11px] font-bold">APK</span>
+          </button>
           {/* Mobile frame toggle */}
           <button
             type="button"
@@ -187,8 +202,8 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
           })}
         </div>
 
-        {/* Secondary Sub-actions (Hangar / Logros) */}
-        <div className="flex items-center justify-center gap-3">
+        {/* Secondary Sub-actions (Hangar / Logros / APK) */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => {
@@ -212,11 +227,24 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
             <Trophy className="w-3.5 h-3.5 text-amber-400" />
             <span>Logros Play Games</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              sound.click();
+              onOpenApkModal();
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-500/40 hover:border-emerald-400 text-xs font-semibold text-emerald-300 transition-colors"
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span>APK Móvil & GitHub</span>
+          </button>
         </div>
 
-        {/* Single Flat Control Hint Line (as mandated by guidelines) */}
-        <div className="text-center text-[11px] font-mono text-slate-500 tracking-wide">
-          WASD / Joystick Mover · Espacio Dash · E Habilidad Especial · P Pausa
+        {/* Single Flat Control Hint Line */}
+        <div className="text-center text-[10px] sm:text-[11px] font-mono text-slate-400 tracking-wide">
+          <span className="sm:hidden">Toca y desliza para volar · Botones táctiles Dash y Especial</span>
+          <span className="hidden sm:inline">Táctil / WASD para mover · Dash [Espacio] · Especial [E] · Pausa [Esc]</span>
         </div>
       </div>
     </div>

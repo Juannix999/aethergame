@@ -6,6 +6,7 @@ interface PauseModalProps {
   onResume: () => void;
   onRestart: () => void;
   onHome: () => void;
+  onOpenApkModal?: () => void;
   isMuted: boolean;
   onToggleMute: () => void;
   hapticsEnabled: boolean;
@@ -18,6 +19,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({
   onResume,
   onRestart,
   onHome,
+  onOpenApkModal,
   isMuted,
   onToggleMute,
   hapticsEnabled,
@@ -60,6 +62,20 @@ export const PauseModal: React.FC<PauseModalProps> = ({
             <RotateCcw className="w-4 h-4" />
             <span>REINICIAR PARTIDA</span>
           </button>
+
+          {onOpenApkModal && (
+            <button
+              type="button"
+              onClick={() => {
+                sound.click();
+                onOpenApkModal();
+              }}
+              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold tracking-wide transition-all"
+            >
+              <span>📲</span>
+              <span>DESCARGAR APK & COMPARTIR</span>
+            </button>
+          )}
 
           <button
             type="button"

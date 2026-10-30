@@ -80,7 +80,7 @@ const DEFAULT_SAVE: GameSaveData = {
   soundMuted: false,
   hapticsEnabled: true,
   autoAim: true,
-  showMobileFrame: false, // Default full viewport, user can toggle Play Store smartphone frame
+  showMobileFrame: true, // Default to smartphone frame for mobile experience
 };
 
 const STORAGE_KEY = 'aether_strike_save_v1';

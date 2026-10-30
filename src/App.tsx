@@ -12,6 +12,7 @@ import { PauseModal } from './components/PauseModal';
 import { GameOverModal } from './components/GameOverModal';
 import { HangarModal } from './components/HangarModal';
 import { AchievementsModal } from './components/AchievementsModal';
+import { ApkModal } from './components/ApkModal';
 import { Trophy, Wifi, BatteryCharging, Signal } from 'lucide-react';
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
   // Auxiliary Modals
   const [showHangar, setShowHangar] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showApkModal, setShowApkModal] = useState(false);
   const [achievementToast, setAchievementToast] = useState<string | null>(null);
 
   // Sound & Settings
@@ -336,15 +338,26 @@ export default function App() {
       <div
         className={`relative flex items-center justify-center transition-all duration-300 ${
           showMobileFrame
-            ? 'w-[420px] max-w-[94vw] h-[860px] max-h-[96vh] rounded-[48px] p-3.5 bg-slate-900 border-[6px] border-slate-700 shadow-[0_25px_70px_rgba(0,0,0,0.85)] ring-1 ring-slate-600/50'
+            ? 'w-full h-full sm:w-[412px] sm:max-w-[94vw] sm:h-[840px] sm:max-h-[96vh] sm:rounded-[48px] sm:p-3 sm:bg-slate-900 sm:border-[6px] sm:border-slate-700 sm:shadow-[0_25px_70px_rgba(0,0,0,0.85)] sm:ring-1 sm:ring-slate-600/50'
             : 'w-full h-full'
         }`}
       >
+        {/* Smartphone Hardware Buttons (Visible on desktop smartphone frame) */}
+        {showMobileFrame && (
+          <div className="hidden sm:block pointer-events-none">
+            {/* Volume Rocker buttons (Left side) */}
+            <div className="absolute -left-[9px] top-28 w-[3px] h-12 rounded-l-sm bg-slate-600 shadow-sm" />
+            <div className="absolute -left-[9px] top-44 w-[3px] h-12 rounded-l-sm bg-slate-600 shadow-sm" />
+            {/* Power button (Right side) */}
+            <div className="absolute -right-[9px] top-36 w-[3px] h-10 rounded-r-sm bg-slate-600 shadow-sm" />
+          </div>
+        )}
+
         {/* Mobile Chassis Top Notch & Camera Hole (Visible only in Mobile Frame Mode) */}
         {showMobileFrame && (
           <>
             {/* Phone Speaker & Camera punch hole */}
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center gap-2 z-50 pointer-events-none">
+            <div className="hidden sm:flex absolute top-2 left-1/2 -translate-x-1/2 items-center gap-2 z-50 pointer-events-none">
               <div className="w-12 h-1 rounded-full bg-slate-800" />
               <div className="w-3.5 h-3.5 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center">
                 <div className="w-1.5 h-1.5 rounded-full bg-sky-950" />
@@ -352,9 +365,10 @@ export default function App() {
             </div>
 
             {/* Simulated Android Status Bar */}
-            <div className="absolute top-5 inset-x-8 flex justify-between items-center text-[11px] font-mono font-semibold text-slate-400 z-50 pointer-events-none select-none">
-              <span>12:00</span>
+            <div className="hidden sm:flex absolute top-4 inset-x-8 justify-between items-center text-[10px] font-mono font-semibold text-slate-400 z-50 pointer-events-none select-none">
+              <span className="tabular-nums">12:45</span>
               <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-bold text-slate-500">5G</span>
                 <Signal className="w-3 h-3" />
                 <Wifi className="w-3 h-3" />
                 <BatteryCharging className="w-3.5 h-3.5 text-cyan-400" />
@@ -366,7 +380,7 @@ export default function App() {
         {/* Viewport Box */}
         <div
           className={`relative w-full h-full overflow-hidden bg-slate-950 ${
-            showMobileFrame ? 'rounded-[38px]' : ''
+            showMobileFrame ? 'sm:rounded-[38px]' : ''
           }`}
         >
           {/* Main 60 FPS HTML5 Canvas */}
@@ -391,6 +405,7 @@ export default function App() {
               onStartGame={handleStartGame}
               onOpenHangar={() => setShowHangar(true)}
               onOpenAchievements={() => setShowAchievements(true)}
+              onOpenApkModal={() => setShowApkModal(true)}
               coins={saveData.coins}
               unlockedShips={saveData.unlockedShips}
               isMuted={isMuted}
@@ -446,6 +461,7 @@ export default function App() {
               onResume={handleResume}
               onRestart={handleRestart}
               onHome={handleHome}
+              onOpenApkModal={() => setShowApkModal(true)}
               isMuted={isMuted}
               onToggleMute={handleToggleMute}
               hapticsEnabled={hapticsEnabled}
@@ -463,6 +479,7 @@ export default function App() {
               onHome={handleHome}
               onOpenHangar={() => setShowHangar(true)}
               onOpenAchievements={() => setShowAchievements(true)}
+              onOpenApkModal={() => setShowApkModal(true)}
             />
           )}
 
@@ -486,6 +503,11 @@ export default function App() {
               achievements={saveData.achievements}
               onClose={() => setShowAchievements(false)}
             />
+          )}
+
+          {/* Secondary Modal: APK Download & GitHub Sharing */}
+          {showApkModal && (
+            <ApkModal onClose={() => setShowApkModal(false)} />
           )}
 
           {/* Bottom Swipe Indicator (In mobile frame mode) */}
