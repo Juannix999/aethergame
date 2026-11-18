@@ -46,6 +46,13 @@ export default function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [achievementToast, setAchievementToast] = useState<string | null>(null);
 
+  const showHangarRef = useRef(showHangar);
+  const showAchievementsRef = useRef(showAchievements);
+  const showSettingsRef = useRef(showSettingsModal);
+  showHangarRef.current = showHangar;
+  showAchievementsRef.current = showAchievements;
+  showSettingsRef.current = showSettingsModal;
+
   // Sound & Settings
   const [isMuted, setIsMuted] = useState<boolean>(() => loadSaveData().soundMuted);
   const [hapticsEnabled, setHapticsEnabled] = useState<boolean>(() => loadSaveData().hapticsEnabled);
@@ -199,6 +206,82 @@ export default function App() {
       window.removeEventListener('blur', handleBlur);
     };
   }, [selectedShip]);
+
+  // Android / Mobile Back Button handler (Capacitor MainActivity & Browser History popstate)
+  useEffect(() => {
+    const handleBackAction = (): boolean => {
+      if (showSettingsRef.current) {
+        setShowSettingsModal(false);
+        return true;
+      }
+      if (showHangarRef.current) {
+        setShowHangar(false);
+        return true;
+      }
+      if (showAchievementsRef.current) {
+        setShowAchievements(false);
+        return true;
+      }
+
+      const engine = engineRef.current;
+      if (!engine) return false;
+
+      if (engine.state === 'PLAYING') {
+        engine.setState('PAUSED');
+        return true;
+      }
+      if (engine.state === 'PAUSED') {
+        engine.setState('PLAYING');
+        return true;
+      }
+      if (engine.state === 'LEVEL_UP') {
+        return true;
+      }
+      if (engine.state === 'GAME_OVER') {
+        engine.setState('TITLE');
+        sound.stopAmbientTrack();
+        return true;
+      }
+      return false;
+    };
+
+    (window as any).__aetherHandleBack = handleBackAction;
+
+    const handlePopState = () => {
+      const handled = handleBackAction();
+      const currentState = engineRef.current?.state;
+      if (
+        handled &&
+        (currentState === 'PLAYING' ||
+          currentState === 'PAUSED' ||
+          currentState === 'LEVEL_UP' ||
+          currentState === 'GAME_OVER')
+      ) {
+        window.history.pushState({ aetherGuard: true }, '');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      delete (window as any).__aetherHandleBack;
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Push browser history guard when playing or opening modals so mobile Back button pauses instead of leaving
+  useEffect(() => {
+    const needsGuard =
+      gameState === 'PLAYING' ||
+      gameState === 'PAUSED' ||
+      gameState === 'LEVEL_UP' ||
+      showHangar ||
+      showAchievements ||
+      showSettingsModal;
+
+    if (needsGuard && !window.history.state?.aetherGuard) {
+      window.history.pushState({ aetherGuard: true }, '');
+    }
+  }, [gameState, showHangar, showAchievements, showSettingsModal]);
 
   // Callbacks
   const handleStartGame = () => {
@@ -383,7 +466,7 @@ export default function App() {
 
         {/* Achievement Toast Banner (Slides in on unlock) */}
         {achievementToast && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/95 border border-amber-500/80 shadow-lg shadow-amber-500/20 text-xs font-heading font-bold text-amber-300 animate-in slide-in-from-top duration-300">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/95 border border-amber-500/80 shadow-lg shadow-amber-500/20 text-xs font-heading font-bold text-amber-300 animate-in slide-in-from-top duration-300">
             <Trophy className="w-4 h-4 text-amber-400 animate-bounce" />
             <span>¡Logro Desbloqueado: {achievementToast}!</span>
           </div>
@@ -457,6 +540,20 @@ export default function App() {
             onToggleMute={handleToggleMute}
             hapticsEnabled={hapticsEnabled}
             onToggleHaptics={handleToggleHaptics}
+            autoAim={autoAim}
+            onToggleAutoAim={handleToggleAutoAim}
+            sensitivity={saveData.joystickSensitivity || 'normal'}
+            onChangeSensitivity={(lvl) => handleUpdateSetting('joystickSensitivity', lvl)}
+            missionStats={{
+              wave: hudData.wave,
+              score: hudData.score,
+              level: hudData.level,
+              hp: hudData.hp,
+              maxHp: hudData.maxHp,
+              coinsThisRun: hudData.coinsThisRun,
+              shipName: selectedShip.name,
+              weatherName: hudData.weather?.name,
+            }}
           />
         )}
 
