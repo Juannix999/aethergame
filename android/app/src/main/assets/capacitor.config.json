@@ -1,0 +1,14 @@
+{
+	"appId": "com.aetherstrike.hypersurvivor",
+	"appName": "Aether Strike: Hyper Survivor",
+	"webDir": "dist",
+	"bundledWebRuntime": false,
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"allowMixedContent": true,
+		"captureInput": true,
+		"webContentsDebuggingEnabled": false
+	}
+}

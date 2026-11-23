@@ -1,0 +1,19 @@
+{
+  "name": "Aether Strike: Hyper Survivor",
+  "short_name": "Aether Strike",
+  "description": "Juego de acción roguelite interactivo arcade optimizado para Play Store con controles táctiles, sonido procedural y física a 60 FPS.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "arcade", "action"]
+}

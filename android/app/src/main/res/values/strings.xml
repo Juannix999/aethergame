@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Aether Strike: Hyper Survivor</string>
+    <string name="title_activity_main">Aether Strike: Hyper Survivor</string>
+    <string name="package_name">com.aetherstrike.hypersurvivor</string>
+    <string name="custom_url_scheme">com.aetherstrike.hypersurvivor</string>
+</resources>
